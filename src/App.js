@@ -6,17 +6,28 @@ import './App.css'; // 커스텀 CSS
 function App() {
   const [value, setValue] = useState(new Date());
   const [events, setEvents] = useState({});
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   // 특정 날짜에 메모를 추가하는 함수
   const addMemo = (date, memo) => {
     const formattedDate = date.toDateString();
     setEvents((prevEvents) => ({
       ...prevEvents,
-      [formattedDate]: memo,
+      [formattedDate]: prevEvents[formattedDate]
+        ? [...prevEvents[formattedDate], memo]
+        : [memo],
     }));
   };
 
-  const handleDateClick = () => {
+  // 날짜 클릭 시 팝업 열기
+  const handleDateClick = (date) => {
+    setSelectedDate(date.toDateString());
+    setShowPopup(true);
+  };
+
+  // 메모 추가 버튼 클릭
+  const handleAddMemo = () => {
     const memo = prompt('메모를 입력하세요:');
     if (memo) {
       addMemo(value, memo);
@@ -29,13 +40,30 @@ function App() {
       <Calendar
         onChange={setValue}
         value={value}
+        onClickDay={handleDateClick}
         tileContent={({ date }) => {
-          const memo = events[date.toDateString()];
-          return memo ? <div className="tile-content">{memo}</div> : null;
+          const memos = events[date.toDateString()];
+          return memos ? (
+            <div className="tile-content">{memos.length}개의 메모</div>
+          ) : null;
         }}
       />
       <p>선택한 날짜: {value.toDateString()}</p>
-      <button onClick={handleDateClick}>메모 추가</button>
+      <button onClick={handleAddMemo}>메모 추가</button>
+
+      {showPopup && selectedDate && (
+        <div className="popup">
+          <div className="popup-content">
+            <h2>{selectedDate}</h2>
+            <ul>
+              {events[selectedDate]?.map((memo, index) => (
+                <li key={index}>{memo}</li>
+              )) || <p>메모가 없습니다.</p>}
+            </ul>
+            <button onClick={() => setShowPopup(false)}>닫기</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

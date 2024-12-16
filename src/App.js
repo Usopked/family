@@ -1,37 +1,52 @@
-import React, { useState } from 'react';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css'; // 기본 스타일 가져오기
-import './App.css'; // 커스텀 CSS
+import React, { useState } from "react";
+import Modal from "react-modal";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css"; // 기본 스타일 가져오기
+import "./App.css"; // 커스텀 CSS
+
+// Modal의 root element 설정
+Modal.setAppElement("#root");
 
 function App() {
   const [value, setValue] = useState(new Date());
   const [events, setEvents] = useState({});
-  const [showPopup, setShowPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [editDeletePopup, setEditDeletePopup] = useState(false);
+  const [editingPost, setEditingPost] = useState(null); // 현재 수정/삭제할 포스트 정보
 
-  // 특정 날짜에 메모를 추가하는 함수
-  const addMemo = (date, memo) => {
-    const formattedDate = date.toDateString();
-    setEvents((prevEvents) => ({
-      ...prevEvents,
-      [formattedDate]: prevEvents[formattedDate]
-        ? [...prevEvents[formattedDate], memo]
-        : [memo],
-    }));
-  };
-
-  // 날짜 클릭 시 팝업 열기
   const handleDateClick = (date) => {
     setSelectedDate(date.toDateString());
-    setShowPopup(true);
+    setEditDeletePopup(true);
   };
 
-  // 메모 추가 버튼 클릭
-  const handleAddMemo = () => {
-    const memo = prompt('메모를 입력하세요:');
-    if (memo) {
-      addMemo(value, memo);
+  const handleEdit = () => {
+    const updatedPost = prompt("수정할 내용을 입력하세요:", editingPost);
+    if (updatedPost) {
+      // 수정 로직
+      setEvents((prev) => {
+        const updatedEvents = { ...prev };
+        const userPosts = [...updatedEvents[selectedDate]];
+        userPosts[editingPost.index] = updatedPost; // 포스트 수정
+        updatedEvents[selectedDate] = userPosts;
+        return updatedEvents;
+      });
     }
+    setEditDeletePopup(false);
+  };
+
+  const handleDelete = () => {
+    setEvents((prev) => {
+      const updatedEvents = { ...prev };
+      const userPosts = [...updatedEvents[selectedDate]];
+      userPosts.splice(editingPost.index, 1); // 포스트 삭제
+      if (userPosts.length === 0) {
+        delete updatedEvents[selectedDate]; // 모든 포스트가 삭제되면 날짜 제거
+      } else {
+        updatedEvents[selectedDate] = userPosts;
+      }
+      return updatedEvents;
+    });
+    setEditDeletePopup(false);
   };
 
   return (
@@ -41,29 +56,21 @@ function App() {
         onChange={setValue}
         value={value}
         onClickDay={handleDateClick}
-        tileContent={({ date }) => {
-          const memos = events[date.toDateString()];
-          return memos ? (
-            <div className="tile-content">{memos.length}개의 메모</div>
-          ) : null;
-        }}
       />
-      <p>선택한 날짜: {value.toDateString()}</p>
-      <button onClick={handleAddMemo}>메모 추가</button>
+      <p>선택한 날짜: {selectedDate}</p>
 
-      {showPopup && selectedDate && (
-        <div className="popup">
-          <div className="popup-content">
-            <h2>{selectedDate}</h2>
-            <ul>
-              {events[selectedDate]?.map((memo, index) => (
-                <li key={index}>{memo}</li>
-              )) || <p>메모가 없습니다.</p>}
-            </ul>
-            <button onClick={() => setShowPopup(false)}>닫기</button>
-          </div>
-        </div>
-      )}
+      {/* 수정/삭제 Modal */}
+      <Modal
+        isOpen={editDeletePopup}
+        onRequestClose={() => setEditDeletePopup(false)}
+        className="custom-modal"
+        overlayClassName="custom-overlay"
+      >
+        <h2>{selectedDate} - 수정 또는 삭제</h2>
+        <button onClick={handleEdit}>수정</button>
+        <button onClick={handleDelete}>삭제</button>
+        <button onClick={() => setEditDeletePopup(false)}>닫기</button>
+      </Modal>
     </div>
   );
 }

@@ -78,14 +78,19 @@
 /* 포스트 컨테이너 */
 .posts {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
   padding: 10px;
+  overflow-x: auto; /* 횡스크롤 활성화 */
+  overflow-y: hidden; /* 불필요한 세로 스크롤 제거 */
+  max-width: 100%; /* 화면 너비를 넘지 않도록 제한 */
+  scroll-behavior: smooth; /* 스크롤 부드럽게 이동 */
 }
 
+/* 포스트 스타일 */
 .posts .post {
-  min-width: 120px;
-  padding: 8px;
+  flex: 0 0 auto; /* 각 포스트가 가로로 나란히 배치 */
+  width: 120px; /* 가로 크기 */
+  aspect-ratio: 1 / 1; /* 정사각형 비율 유지 */
   background-color: #ffeb3b;
   border-radius: 8px;
   font-size: 12px;
@@ -114,4 +119,37 @@
 .events-container {
   width:300px;
   height: auto;
+}
+
+/* 캘린더 컨테이너 스타일 */
+.react-calendar {
+  width: 100%;
+  max-width: 500px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/* 각 날짜 셀 스타일 */
+.react-calendar__tile {
+  padding: 15px; /* 날짜 셀 크기 조정 */
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+/* 날짜 셀 hover 효과 */
+.react-calendar__tile:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* 선택된 날짜 스타일 */
+.react-calendar__tile--active {
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 4px;
 }

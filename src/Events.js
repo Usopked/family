@@ -6,7 +6,7 @@ function Events({ selectedDate, users, events, onAddPost, onClose }) {
     <>
       <div className="overlay" onClick={onClose}></div>
       <div className="events-container">
-        <h2>선택한 날짜: {selectedDate}</h2>
+        <h2>{selectedDate}</h2>
         {users.map((user) => (
           <div key={user.name} className="user-block">
             <div className="user-header">

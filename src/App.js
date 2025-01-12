@@ -94,7 +94,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1>React Calendar with Firebase</h1>
+      <h1>Family Calendar</h1>
       <UserManagement onRegister={handleRegisterUser} onDelete={deleteUser} />
       <EventCalendar value={value} onChange={setValue} onDateClick={handleDateClick} />
       {showEvents && (
